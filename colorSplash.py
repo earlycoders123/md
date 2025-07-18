@@ -1,14 +1,24 @@
 import streamlit as st
-import random
+import requests
 
-st.title("🎨 AI Color Splash App")
+st.title("📚 AI Storybook Creator")
 
-colors = st.multiselect("Pick your favorite colors:", ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'])
+title = st.text_input("Story Title")
+mood = st.selectbox("Pick Story Mood:", ["Adventure", "Funny", "Scary", "Magical"])
 
-if st.button("Splash Colors!"):
-    if colors:
-        splash = random.choices(colors, k=10)
-        st.subheader("💥 Color Splash:")
-        st.write(splash)
-    else:
-        st.warning("Please pick at least one color!")
+if st.button("Generate My Story!"):
+    # Step 1: AI Story (GPT2 via Hugging Face)
+    API_URL = "https://api-inference.huggingface.co/models/gpt2"
+    headers = {"Authorization": "Bearer YOUR_HUGGINGFACE_API_TOKEN"}
+    prompt = f"Write a {mood.lower()} story titled '{title}' for kids."
+
+    response = requests.post(API_URL, headers=headers, json={"inputs": prompt})
+    story = response.json()[0]['generated_text']
+    st.success("Here is your AI Story:")
+    st.write(story)
+
+    # Step 2: AI Image (Bing Image Creator)
+    image_prompt = f"storybook cover for {title} in {mood.lower()} style"
+    st.write("Click below to generate cover image:")
+    st.link_button("Generate Cover Image", f"https://www.bing.com/images/create?q={image_prompt.replace(' ','+')}")
+
