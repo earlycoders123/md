@@ -12,6 +12,18 @@ model = genai.GenerativeModel('gemini-2.5-pro')
 # Generate Story
 user_prompt = st.text_input("Enter your story prompt:")
 
-if st.button("Generate Story"):
-    # Use the prompt to generate story
-    st.write(response.text)
+# When button is clicked
+if st.button("Generate Story") and user_prompt:
+    # Generate content from Gemini
+    response = model.generate_content(user_prompt)
+
+    # Check if response is valid
+    if response and hasattr(response, 'text'):
+        st.subheader("🎉 AI-Generated Story:")
+        st.write(response.text)
+    else:
+        st.error("❌ AI did not return a story. Please try again.")
+
+
+
+
