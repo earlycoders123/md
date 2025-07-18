@@ -10,7 +10,7 @@ title = st.text_input("Enter Story Title:")
 mood = st.selectbox("Choose Story Mood:", ["Adventure", "Funny", "Scary", "Magical"])
 
 if st.button("✨ Generate Story"):
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('gemini-1.5-pro')
 
     prompt = f"Write a short {mood.lower()} story for kids titled '{title}'. Make it fun and creative."
 
