@@ -5,7 +5,7 @@ from PIL import Image
 from io import BytesIO
 
 # Set your OpenAI API key
-client = openai.OpenAI(api_key="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")
+client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.set_page_config(page_title="AI Image Generator for Kids", page_icon="🖼️")
 st.title("🖼️ AI Image Generator for Kids")
