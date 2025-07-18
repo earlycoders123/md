@@ -4,7 +4,7 @@ import requests
 st.title("📚 AI Storybook Creator")
 
 # Load Hugging Face API token securely from secrets
-HF_TOKEN = st.secrets["api"]["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"]
+HF_TOKEN = st.secrets["api"]["huggingface_token"]
 
 API_URL = "https://api-inference.huggingface.co/models/gpt2"
 headers = {"Authorization": f"Bearer {HF_TOKEN}"}
