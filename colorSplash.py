@@ -7,7 +7,7 @@ import streamlit as st
 genai.configure(api_key="AIzaSyDI5Hr2zxpxm3ZyfCGgO5iTWeAp_eprUaA")
 
 # Load Gemini Model
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-1.0-pro-vision-latest')
 
 # Streamlit App
 st.set_page_config(page_title="Text to Story Generator", page_icon="📖")
