@@ -1,33 +1,17 @@
-import streamlit as st
-import os
+
+# Import
 import google.generativeai as genai
 
-# Set environment variable manually
-os.environ["GEMINI_API_KEY"] = "AIzaSyCtDlmvc6hqwVimM60IFMZxOXDMbzJo33Q"
+# Set your Gemini API Key
+genai.configure(api_key="AIzaSyDI5Hr2zxpxm3ZyfCGgO5iTWeAp_eprUaA")  # Paste actual key
 
-# Load in code
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+# Use Gemini Pro Model
+model = genai.GenerativeModel('gemini-2.5-pro')
 
-# Streamlit UI
-st.title("📖 AI Storybook Creator (Powered by Gemini)")
+# Generate Story
+prompt = "Write a short, colorful story for kids about a magical cat."
 
-title = st.text_input("Enter Story Title:")
-mood = st.selectbox("Choose Story Mood:", ["Adventure", "Magical", "Funny", "Scary"])
+response = model.generate_content(prompt)
 
-if st.button("✨ Generate Story"):
-
-    # Initialize Gemini Pro model (Official name)
-    model = genai.GenerativeModel('gemini-pro')
-
-    # Create prompt
-    prompt = f"Write a short {mood.lower()} story for kids titled '{title}'. Make it colorful, simple, and fun."
-
-    # Generate Story
-    try:
-        response = model.generate_content(prompt)
-        story = response.text
-        st.subheader("📚 Here is your AI Story:")
-        st.write(story)
-    except Exception as e:
-        st.error("⚠️ AI failed to generate content. Check your API key or quota.")
-        st.write(e)
+# Show the story
+print(response.text)
