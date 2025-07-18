@@ -1,55 +1,46 @@
-# text_to_image_generator.py
-
-import google.generativeai as genai
 import streamlit as st
+import openai
+import requests
 from PIL import Image
-import io
-import base64
+from io import BytesIO
 
-# Set Gemini API Key
-genai.configure(api_key="AIzaSyDI5Hr2zxpxm3ZyfCGgO5iTWeAp_eprUaA")  # Secure via secrets in production
-
-# Load Gemini Model (Multimodal)
-model = genai.GenerativeModel('models/gemini-2.5-pro')  # Correct multimodal model
+# Set your OpenAI API key (replace with Streamlit Secrets for safety in production)
+openai.api_key = "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"
 
 # Streamlit App
-st.set_page_config(page_title="Text to Image Generator", page_icon="🖼️")
-
-st.title("🎨 AI Image Generator for Kids")
-st.write("Describe your image and get AI-generated artwork!")
+st.set_page_config(page_title="AI Image Generator for Kids", page_icon="🖼️")
+st.title("🖼️ AI Image Generator for Kids")
+st.write("✨ Describe anything you like, and watch AI turn it into a picture!")
 
 # Input Box
-prompt = st.text_input("📝 Describe your image:")
+prompt = st.text_input("📝 What should AI draw for you?")
 
-# Button to Generate Image
-if st.button("🎨 Generate Image"):
+# Generate Button
+if st.button("✨ Generate Picture"):
     if prompt.strip() != "":
-        with st.spinner("Creating your image..."):
-            response = model.generate_content(prompt + ". Generate a simple cartoon-like image.")
+        with st.spinner("Creating your magical picture..."):
+            response = openai.Image.create(
+                model="dall-e-3",
+                prompt=prompt,
+                n=1,
+                size="512x512"
+            )
+            image_url = response["data"][0]["url"]
 
-            # Extract image bytes from response
-            image_data = None
-            for part in response.parts:
-                if part.mime_type.startswith("image/"):
-                    image_data = part.data
+            # Fetch and Display Image
+            image_response = requests.get(image_url)
+            image = Image.open(BytesIO(image_response.content))
+            st.image(image, caption="🎉 Your AI-created picture!")
 
-            if image_data:
-                image = Image.open(io.BytesIO(image_data))
-                st.image(image, caption="Here’s your AI-generated image!")
-
-                # Optional: Download button
-                buffered = io.BytesIO()
-                image.save(buffered, format="PNG")
-                st.download_button(
-                    label="Download Image",
-                    data=buffered.getvalue(),
-                    file_name="ai_image.png",
-                    mime="image/png"
-                )
-            else:
-                st.error("No image was generated. Try a simpler prompt.")
+            # Download Button
+            st.download_button(
+                label="📥 Download Image",
+                data=image_response.content,
+                file_name="your_ai_image.png",
+                mime="image/png"
+            )
     else:
-        st.warning("Please describe your image!")
+        st.warning("Please describe what you want to see!")
 
 # Footer
-st.caption("Made with ❤️ using Streamlit & Gemini AI")
+st.caption("Made with ❤️ using OpenAI DALL·E and Streamlit")
