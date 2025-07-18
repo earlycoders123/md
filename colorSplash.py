@@ -1,25 +1,27 @@
 import streamlit as st
 import requests
 
-# Load your Gemini API Key from Streamlit Secrets
+# Load your Gemini API key from Streamlit Secrets
 API_KEY = st.secrets["api"]["gemini_key"]
 
-st.title("📚 AI Storybook Creator (Powered by Gemini)")
+st.title("📚 AI Storybook Creator (Powered by Gemini Pro)")
 
 title = st.text_input("Enter Story Title:")
 mood = st.selectbox("Choose Story Mood:", ["Adventure", "Funny", "Scary", "Magical"])
 
 if st.button("✨ Generate My Story!"):
-    with st.spinner("Generating your story using Gemini..."):
+    with st.spinner("Generating your story using Gemini Pro..."):
 
-        prompt = f"Write a {mood.lower()} story for kids with the title '{title}'. Keep it fun and creative."
+        prompt = f"Write a {mood.lower()} story for kids with the title '{title}'. Keep it simple, short, and fun."
 
-        # Gemini API Endpoint
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}"
+        # ✅ Correct Gemini Pro API Endpoint
+        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key={API_KEY}"
 
         payload = {
             "contents": [
-                {"parts": [{"text": prompt}]}
+                {
+                    "parts": [{"text": prompt}]
+                }
             ]
         }
 
@@ -29,12 +31,11 @@ if st.button("✨ Generate My Story!"):
         response = requests.post(url, headers=headers, json=payload)
         result = response.json()
 
-        # Extract and display story
         try:
+            # ✅ Extract generated text properly
             story = result['candidates'][0]['content']['parts'][0]['text']
-            st.success("Here is your AI Story!")
+            st.success("🎉 Your AI Story is ready!")
             st.write(story)
         except Exception as e:
-            st.error("❌ Failed to generate story. Check API key or request limits.")
-            st.write(result)  # Show full API response for debugging
-
+            st.error("❌ AI failed to generate a story. Check API key or quotas.")
+            st.write(result)
