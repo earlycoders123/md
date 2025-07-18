@@ -1,34 +1,40 @@
 import streamlit as st
 import requests
 
-st.title("📚 AI Storybook Creator")
+# Load your Gemini API Key from Streamlit Secrets
+API_KEY = st.secrets["api"]["gemini_key"]
 
-# Load Hugging Face API token securely from secrets
-HF_TOKEN = st.secrets["api"]["huggingface_token"]
+st.title("📚 AI Storybook Creator (Powered by Gemini)")
 
-API_URL = "https://api-inference.huggingface.co/models/gpt2"
-headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+title = st.text_input("Enter Story Title:")
+mood = st.selectbox("Choose Story Mood:", ["Adventure", "Funny", "Scary", "Magical"])
 
-title = st.text_input("Story Title")
-mood = st.selectbox("Pick Story Mood:", ["Adventure", "Funny", "Scary", "Magical"])
+if st.button("✨ Generate My Story!"):
+    with st.spinner("Generating your story using Gemini..."):
 
-if st.button("Generate My Story!"):
-    with st.spinner("⏳ Generating your story..."):
-        prompt = f"Write a {mood.lower()} story titled '{title}' for kids."
-        response = requests.post(API_URL, headers=headers, json={"inputs": prompt})
+        prompt = f"Write a {mood.lower()} story for kids with the title '{title}'. Keep it fun and creative."
+
+        # Gemini API Endpoint
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}"
+
+        payload = {
+            "contents": [
+                {"parts": [{"text": prompt}]}
+            ]
+        }
+
+        headers = {"Content-Type": "application/json"}
+
+        # API Call
+        response = requests.post(url, headers=headers, json=payload)
         result = response.json()
 
-        # Handle errors or incomplete API responses
-        if isinstance(result, list) and 'generated_text' in result[0]:
-            story = result[0]['generated_text']
-            st.success("Here is your AI Story:")
+        # Extract and display story
+        try:
+            story = result['candidates'][0]['content']['parts'][0]['text']
+            st.success("Here is your AI Story!")
             st.write(story)
-        else:
-            st.error("⚠️ Error: AI did not return a story. Please try again or check your API token.")
-            st.write(result)  # Display API response for debugging
-
-    # Step 2: Generate Cover Image via Bing (manual step)
-    image_prompt = f"storybook cover for {title} in {mood.lower()} style"
-    st.write("Click below to generate your cover image:")
-    st.link_button("Generate Cover Image", f"https://www.bing.com/images/create?q={image_prompt.replace(' ','+')}")
+        except Exception as e:
+            st.error("❌ Failed to generate story. Check API key or request limits.")
+            st.write(result)  # Show full API response for debugging
 
