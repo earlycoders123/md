@@ -16,12 +16,11 @@ if st.button("Generate Image"):
     if prompt:
         with st.spinner("AI is drawing..."):
             response = client.images.generate(
-                model="dall-e-3",
-                prompt=prompt,
-                size="1024x1024",  # You can also try 512x512 to lower image size
-                quality="standard",  # or "hd" for higher quality
-                n=1
-            )
+            model="dall-e-2",   # Use dall-e-2 instead of dall-e-3
+            prompt=prompt,
+            size="512x512",     # Smaller size reduces cost
+            n=1
+)
             image_url = response.data[0].url
 
             # Fetch and Display Image
