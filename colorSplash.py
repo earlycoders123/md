@@ -1,33 +1,38 @@
-# story_generator.py
+# pencil_sketch_app.py
 
-import google.generativeai as genai
 import streamlit as st
+import cv2
+import numpy as np
+from PIL import Image
 
-# Set Gemini API Key (Replace with your real key)
-genai.configure(api_key="AIzaSyDI5Hr2zxpxm3ZyfCGgO5iTWeAp_eprUaA")
+# Streamlit UI
+st.set_page_config(page_title="🖤 Pencil Sketch Maker", layout="centered")
+st.title("✏️ Black & White Pencil Sketch Generator")
 
-# Load Gemini Model
-model = genai.GenerativeModel('gemini-2.5-pro')
+uploaded_file = st.file_uploader("📸 Upload a photo", type=["jpg", "jpeg", "png"])
 
-# Streamlit App
-st.set_page_config(page_title="Text to Story Generator", page_icon="📖")
+# Pencil Sketch Function
+def pencil_sketch(image):
+    gray_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    inverted_img = 255 - gray_img
+    blurred = cv2.GaussianBlur(inverted_img, (21, 21), 0)
+    inverted_blur = 255 - blurred
+    sketch = cv2.divide(gray_img, inverted_blur, scale=256.0)
+    return sketch
 
-st.title("📖 AI Story Generator for Kids")
-st.write("Enter your idea and get a magical story!")
+# If image uploaded
+if uploaded_file is not None:
+    img = Image.open(uploaded_file)
+    img_np = np.array(img)
+    img_cv2 = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
 
-# Input Box
-prompt = st.text_input("📝 Enter your story idea:")
+    # Generate Sketch
+    sketch = pencil_sketch(img_cv2)
 
-# Button to Generate Story
-if st.button("✨ Generate Story"):
-    if prompt.strip() != "":
-        with st.spinner("Writing your magical story..."):
-            response = model.generate_content(prompt + " Create a fun and simple children's story.")
-            story = response.text
-            st.success("Here's your story!")
-            st.write(story)
-    else:
-        st.warning("Please enter something to get a story!")
-
-# Footer
-st.caption("Made with ❤️ using Streamlit & Gemini AI")
+    # Show Original and Sketch
+    st.subheader("🎨 Original vs Sketch")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image(img, caption="Original", use_column_width=True)
+    with col2:
+        st.image(sketch, caption="Pencil Sketch", use_column_width=True, channels="GRAY")
